@@ -156,11 +156,14 @@ fun MainScreen(
             paths = viewModel.paths,
             backgroundImage = viewModel.backgroundImage,
             size = canvasSize,
-            paperStyle = viewModel.paperStyle
+            paperStyle = viewModel.paperStyle,
+            backgroundOpacity = viewModel.backgroundOpacity,
+            exportTransparentBg = viewModel.exportTransparentBg
         )
         if (uri != null) {
             coroutineScope.launch {
-                snackbarHostState.showSnackbar("Artwork saved to Pictures!")
+                val message = if (viewModel.exportTransparentBg) "Artwork saved as Transparent PNG!" else "Artwork saved to Pictures!"
+                snackbarHostState.showSnackbar(message)
             }
         }
     }
@@ -171,7 +174,9 @@ fun MainScreen(
             paths = viewModel.paths,
             backgroundImage = viewModel.backgroundImage,
             size = canvasSize,
-            paperStyle = viewModel.paperStyle
+            paperStyle = viewModel.paperStyle,
+            backgroundOpacity = viewModel.backgroundOpacity,
+            exportTransparentBg = viewModel.exportTransparentBg
         )
         if (uri != null) {
             shareImage(context, uri)
@@ -226,7 +231,8 @@ fun MainScreen(
                 onPathStarted = { offset -> viewModel.startPath(offset) },
                 onPathMoved = { offset -> viewModel.movePath(offset) },
                 onPathEnded = { viewModel.endPath() },
-                backgroundImage = viewModel.backgroundImage
+                backgroundImage = viewModel.backgroundImage,
+                backgroundOpacity = viewModel.backgroundOpacity
             )
 
             // Floating Top Studio Glass Bar
@@ -279,7 +285,12 @@ fun MainScreen(
                     onStrokeWidthChanged = { width -> viewModel.updateStrokeWidth(width) },
                     paperStyle = viewModel.paperStyle,
                     onPaperStyleChanged = { style -> viewModel.updatePaperStyle(style) },
-                    isEraserMode = viewModel.isEraserMode
+                    isEraserMode = viewModel.isEraserMode,
+                    hasBackgroundImage = viewModel.backgroundImage != null,
+                    backgroundOpacity = viewModel.backgroundOpacity,
+                    onBackgroundOpacityChanged = { opacity -> viewModel.updateBackgroundOpacity(opacity) },
+                    exportTransparentBg = viewModel.exportTransparentBg,
+                    onToggleExportTransparentBg = { viewModel.toggleExportTransparentBg() }
                 )
             }
         }
@@ -291,57 +302,65 @@ fun saveImageToMediaStore(
     paths: List<PathData>,
     backgroundImage: Bitmap?,
     size: IntSize,
-    paperStyle: PaperStyle
+    paperStyle: PaperStyle,
+    backgroundOpacity: Float = 1f,
+    exportTransparentBg: Boolean = false
 ): Uri? {
     if (size.width <= 0 || size.height <= 0) return null
 
     val bitmap = Bitmap.createBitmap(size.width, size.height, Bitmap.Config.ARGB_8888)
     val canvas = Canvas(bitmap)
-    canvas.drawColor(Color.WHITE)
 
-    val paperPaint = Paint().apply {
-        color = Color.LTGRAY
-        alpha = 60
-        strokeWidth = 2f
-    }
+    if (!exportTransparentBg) {
+        canvas.drawColor(Color.WHITE)
 
-    when (paperStyle) {
-        PaperStyle.GRID -> {
-            val step = 100f
-            for (x in 0..(size.width / step).toInt()) {
-                canvas.drawLine(x * step, 0f, x * step, size.height.toFloat(), paperPaint)
-            }
-            for (y in 0..(size.height / step).toInt()) {
-                canvas.drawLine(0f, y * step, size.width.toFloat(), y * step, paperPaint)
-            }
+        val paperPaint = Paint().apply {
+            color = Color.LTGRAY
+            alpha = 60
+            strokeWidth = 2f
         }
-        PaperStyle.DOTS -> {
-            val step = 100f
-            for (x in 0..(size.width / step).toInt()) {
+
+        when (paperStyle) {
+            PaperStyle.GRID -> {
+                val step = 100f
+                for (x in 0..(size.width / step).toInt()) {
+                    canvas.drawLine(x * step, 0f, x * step, size.height.toFloat(), paperPaint)
+                }
                 for (y in 0..(size.height / step).toInt()) {
-                    canvas.drawCircle(x * step, y * step, 6f, paperPaint)
+                    canvas.drawLine(0f, y * step, size.width.toFloat(), y * step, paperPaint)
                 }
             }
-        }
-        PaperStyle.RULED -> {
-            val step = 120f
-            for (y in 1..(size.height / step).toInt()) {
-                canvas.drawLine(0f, y * step, size.width.toFloat(), y * step, paperPaint)
+            PaperStyle.DOTS -> {
+                val step = 100f
+                for (x in 0..(size.width / step).toInt()) {
+                    for (y in 0..(size.height / step).toInt()) {
+                        canvas.drawCircle(x * step, y * step, 6f, paperPaint)
+                    }
+                }
             }
-            val redMarginPaint = Paint().apply {
-                color = Color.RED
-                alpha = 100
-                strokeWidth = 4f
+            PaperStyle.RULED -> {
+                val step = 120f
+                for (y in 1..(size.height / step).toInt()) {
+                    canvas.drawLine(0f, y * step, size.width.toFloat(), y * step, paperPaint)
+                }
+                val redMarginPaint = Paint().apply {
+                    color = Color.RED
+                    alpha = 100
+                    strokeWidth = 4f
+                }
+                canvas.drawLine(150f, 0f, 150f, size.height.toFloat(), redMarginPaint)
             }
-            canvas.drawLine(150f, 0f, 150f, size.height.toFloat(), redMarginPaint)
+            PaperStyle.PLAIN -> {}
         }
-        PaperStyle.PLAIN -> {}
-    }
 
-    backgroundImage?.let {
-        val src = Rect(0, 0, it.width, it.height)
-        val dst = Rect(0, 0, size.width, size.height)
-        canvas.drawBitmap(it, src, dst, null)
+        backgroundImage?.let {
+            val bgPaint = Paint().apply {
+                alpha = (backgroundOpacity * 255).toInt().coerceIn(0, 255)
+            }
+            val src = Rect(0, 0, it.width, it.height)
+            val dst = Rect(0, 0, size.width, size.height)
+            canvas.drawBitmap(it, src, dst, bgPaint)
+        }
     }
 
     val paint = Paint().apply {

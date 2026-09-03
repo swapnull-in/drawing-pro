@@ -38,6 +38,12 @@ class DrawingViewModel : ViewModel() {
     var backgroundImage by mutableStateOf<Bitmap?>(null)
         private set
 
+    var backgroundOpacity by mutableFloatStateOf(0.7f)
+        private set
+
+    var exportTransparentBg by mutableStateOf(false)
+        private set
+
     var showBrushSettingsSheet by mutableStateOf(false)
 
     var showClearConfirmDialog by mutableStateOf(false)
@@ -136,5 +142,14 @@ class DrawingViewModel : ViewModel() {
     fun updateBackgroundImage(bitmap: Bitmap?) {
         backgroundImage = bitmap
         pathUpdateTrigger++
+    }
+
+    fun updateBackgroundOpacity(opacity: Float) {
+        backgroundOpacity = opacity.coerceIn(0.1f, 1.0f)
+        pathUpdateTrigger++
+    }
+
+    fun toggleExportTransparentBg() {
+        exportTransparentBg = !exportTransparentBg
     }
 }

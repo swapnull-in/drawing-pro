@@ -25,11 +25,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.Layers
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Slider
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -59,6 +62,11 @@ fun StudioBrushSheet(
     paperStyle: PaperStyle,
     onPaperStyleChanged: (PaperStyle) -> Unit,
     isEraserMode: Boolean,
+    hasBackgroundImage: Boolean = false,
+    backgroundOpacity: Float = 0.7f,
+    onBackgroundOpacityChanged: (Float) -> Unit = {},
+    exportTransparentBg: Boolean = false,
+    onToggleExportTransparentBg: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showCustomColorPicker by remember { mutableStateOf(false) }
@@ -127,6 +135,53 @@ fun StudioBrushSheet(
         }
 
         Spacer(modifier = Modifier.height(20.dp))
+
+        // Photo Tracing Background Opacity Slider (If Photo active)
+        AnimatedVisibility(visible = hasBackgroundImage) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 20.dp)
+                    .clip(RoundedCornerShape(16.dp))
+                    .background(MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f))
+                    .padding(16.dp)
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            imageVector = Icons.Default.Image,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Tracing Photo Opacity",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                    Text(
+                        text = "${(backgroundOpacity * 100).toInt()}%",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Slider(
+                    value = backgroundOpacity,
+                    onValueChange = onBackgroundOpacityChanged,
+                    valueRange = 0.1f..1.0f,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
 
         // Stroke Thickness Section
         Row(
@@ -287,6 +342,46 @@ fun StudioBrushSheet(
             )
         }
 
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // Transparent PNG Export Setting Toggle
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(RoundedCornerShape(16.dp))
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    imageVector = Icons.Default.Layers,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(20.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Column {
+                    Text(
+                        text = "Transparent PNG Export",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = "Export artwork without paper background",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+            }
+
+            Switch(
+                checked = exportTransparentBg,
+                onCheckedChange = { onToggleExportTransparentBg() }
+            )
+        }
+
         Spacer(modifier = Modifier.height(32.dp))
     }
 }
@@ -320,7 +415,7 @@ private fun ColorRow(
                     Icon(
                         imageVector = Icons.Default.Check,
                         contentDescription = null,
-                        tint = if (color == Color.White || color.red > 0.8f && color.green > 0.8f) Color.Black else Color.White,
+                        tint = if (color == Color.White || (color.red > 0.8f && color.green > 0.8f)) Color.Black else Color.White,
                         modifier = Modifier.size(20.dp)
                     )
                 }
