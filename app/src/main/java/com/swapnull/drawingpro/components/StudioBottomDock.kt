@@ -1,4 +1,4 @@
-package com.swap.handdrawing.components
+package com.swapnull.drawingpro.components
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
@@ -23,9 +23,7 @@ import androidx.compose.material.icons.filled.AddPhotoAlternate
 import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.filled.Brush
 import androidx.compose.material.icons.filled.ColorLens
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.PhotoCamera
-import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -44,8 +42,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush as ComposeBrush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.swap.handdrawing.theme.AccentCobalt
-import com.swap.handdrawing.theme.AccentCoral
+import com.swapnull.drawingpro.theme.AccentCobalt
+import com.swapnull.drawingpro.theme.AccentCoral
 
 @Composable
 fun StudioBottomDock(

@@ -1,4 +1,4 @@
-package com.swap.handdrawing.theme
+package com.swapnull.drawingpro.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme

@@ -1,4 +1,4 @@
-package com.swap.handdrawing
+package com.swapnull.drawingpro
 
 import android.Manifest
 import android.content.ContentValues
@@ -50,10 +50,10 @@ import androidx.compose.ui.unit.IntSize
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.swap.handdrawing.components.StudioBottomDock
-import com.swap.handdrawing.components.StudioBrushSheet
-import com.swap.handdrawing.components.StudioTopBar
-import com.swap.handdrawing.theme.StudioDrawingTheme
+import com.swapnull.drawingpro.components.StudioBottomDock
+import com.swapnull.drawingpro.components.StudioBrushSheet
+import com.swapnull.drawingpro.components.StudioTopBar
+import com.swapnull.drawingpro.theme.StudioDrawingTheme
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.OutputStream

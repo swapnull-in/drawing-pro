@@ -1,4 +1,4 @@
-package com.swap.handdrawing.components
+package com.swapnull.drawingpro.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

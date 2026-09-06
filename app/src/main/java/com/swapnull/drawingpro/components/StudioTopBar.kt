@@ -1,4 +1,4 @@
-package com.swap.handdrawing.components
+package com.swapnull.drawingpro.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -39,9 +39,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.swap.handdrawing.PaperStyle
-import com.swap.handdrawing.theme.AccentCoral
+import com.swapnull.drawingpro.PaperStyle
+import com.swapnull.drawingpro.theme.AccentCoral
 
 @Composable
 fun StudioTopBar(

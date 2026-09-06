@@ -1,4 +1,4 @@
-package com.swap.handdrawing
+package com.swapnull.drawingpro
 
 import android.graphics.Bitmap
 import android.graphics.Paint

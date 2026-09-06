@@ -1,4 +1,4 @@
-package com.swap.handdrawing.components
+package com.swapnull.drawingpro.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
@@ -49,8 +49,8 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import com.swap.handdrawing.PaperStyle
-import com.swap.handdrawing.theme.AccentCobalt
+import com.swapnull.drawingpro.PaperStyle
+import com.swapnull.drawingpro.theme.AccentCobalt
 import kotlin.math.abs
 
 @Composable

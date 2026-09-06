@@ -1,10 +1,10 @@
-package com.swap.handdrawing
+package com.swapnull.drawingpro
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.swap.handdrawing.theme.StudioDrawingTheme
+import com.swapnull.drawingpro.theme.StudioDrawingTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

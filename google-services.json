@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "163623577899",
+    "project_id": "drawing-pro-f75b7",
+    "storage_bucket": "drawing-pro-f75b7.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:163623577899:android:5f02ef43aba6af73873d6e",
+        "android_client_info": {
+          "package_name": "com.swapnull.drawingpro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjm6vF6tKwvaw2eMLnkheyCTfN1A2Xiik"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

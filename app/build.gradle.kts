@@ -8,7 +8,7 @@ plugins {
 }
 
 android {
-    namespace = "com.swap.handdrawing"
+    namespace = "com.swapnull.drawingpro"
     compileSdk = 35
 
     defaultConfig {
