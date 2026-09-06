@@ -162,22 +162,13 @@
         function drawAppIcon() {
             const canvas = document.getElementById('iconCanvas');
             const ctx = canvas.getContext('2d');
-
-            // Dark Studio Background
-            const bgGrad = ctx.createLinearGradient(0, 0, 512, 512);
-            bgGrad.addColorStop(0, '#12141C');
-            bgGrad.addColorStop(1, '#0A0B10');
-            ctx.fillStyle = bgGrad;
-            ctx.beginPath();
-            ctx.roundRect(0, 0, 512, 512, 110);
-            ctx.fill();
-
-            // Glowing Outer Ring
-            ctx.strokeStyle = '#635BFF';
-            ctx.lineWidth = 6;
-            ctx.beginPath();
-            ctx.roundRect(12, 12, 488, 488, 100);
-            ctx.stroke();
+            const img = new Image();
+            img.onload = function() {
+                ctx.clearRect(0, 0, 512, 512);
+                ctx.drawImage(img, 0, 0, 512, 512);
+            };
+            img.src = 'app_icon_512.png';
+        }
 
             // Vibrant Paint Arc
             ctx.lineWidth = 24;
