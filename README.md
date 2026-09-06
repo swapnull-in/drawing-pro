@@ -1,4 +1,4 @@
-# Drawing Pro (Android Hand Drawing)
+# Drawing Pro
 
 A high-performance, modern sketching application for Android, built from the ground up with **Jetpack Compose** and **Kotlin**. This project showcases a transition from legacy Android practices to the cutting edge of mobile development.
 
