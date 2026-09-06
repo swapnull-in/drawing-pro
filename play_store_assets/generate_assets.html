@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drawing Pro - Play Store Asset Generator</title>
+    <style>
+        :root {
+            --bg-color: #101216;
+            --card-bg: #1C1E24;
+            --accent: #635BFF;
+            --text: #F1F3F9;
+            --muted: #9EA3B5;
+            --border: #383C48;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        p.lead {
+            color: var(--muted);
+            margin-bottom: 40px;
+        }
+
+        .asset-section {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .asset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .asset-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: block;
+        }
+
+        .screenshots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .screenshot-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            padding: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .screenshot-card h4 {
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            color: var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Drawing Pro - Play Store Asset Generator</h1>
+        <p class="lead">Click the "Download PNG" buttons below to download exact-spec pixel-perfect graphics for Google Play Console submission.</p>
+
+        <!-- APP ICON 512x512 -->
+        <div class="asset-section">
+            <div class="asset-header">
+                <div>
+                    <div class="asset-title">1. High-Res App Icon</div>
+                    <div style="color: var(--muted); font-size: 0.9rem;">512 x 512 px PNG (Required)</div>
+                </div>
+                <button class="btn" onclick="downloadCanvas('iconCanvas', 'app_icon_512.png')">Download PNG (512x512)</button>
+            </div>
+            <canvas id="iconCanvas" width="512" height="512"></canvas>
+        </div>
+
+        <!-- FEATURE GRAPHIC 1024x500 -->
+        <div class="asset-section">
+            <div class="asset-header">
+                <div>
+                    <div class="asset-title">2. Feature Graphic Banner</div>
+                    <div style="color: var(--muted); font-size: 0.9rem;">1024 x 500 px PNG (Required)</div>
+                </div>
+                <button class="btn" onclick="downloadCanvas('featureCanvas', 'feature_graphic_1024x500.png')">Download PNG (1024x500)</button>
+            </div>
+            <canvas id="featureCanvas" width="1024" height="500"></canvas>
+        </div>
+
+        <!-- SCREENSHOTS -->
+        <div class="asset-section">
+            <div class="asset-header">
+                <div>
+                    <div class="asset-title">3. Phone Promo Screenshots</div>
+                    <div style="color: var(--muted); font-size: 0.9rem;">1080 x 1920 px Portrait PNGs</div>
+                </div>
+            </div>
+            <div class="screenshots-grid">
+                <div class="screenshot-card">
+                    <h4>Screenshot 1: Studio Canvas</h4>
+                    <canvas id="ss1" width="540" height="960" style="margin-bottom: 12px;"></canvas>
+                    <button class="btn" onclick="downloadCanvas('ss1', 'screenshot_1_canvas.png')">Download PNG</button>
+                </div>
+                <div class="screenshot-card">
+                    <h4>Screenshot 2: Color Wheel</h4>
+                    <canvas id="ss2" width="540" height="960" style="margin-bottom: 12px;"></canvas>
+                    <button class="btn" onclick="downloadCanvas('ss2', 'screenshot_2_color_wheel.png')">Download PNG</button>
+                </div>
+                <div class="screenshot-card">
+                    <h4>Screenshot 3: Tracing Opacity</h4>
+                    <canvas id="ss3" width="540" height="960" style="margin-bottom: 12px;"></canvas>
+                    <button class="btn" onclick="downloadCanvas('ss3', 'screenshot_3_tracing.png')">Download PNG</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function drawAppIcon() {
+            const canvas = document.getElementById('iconCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Dark Studio Background
+            const bgGrad = ctx.createLinearGradient(0, 0, 512, 512);
+            bgGrad.addColorStop(0, '#12141C');
+            bgGrad.addColorStop(1, '#0A0B10');
+            ctx.fillStyle = bgGrad;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, 512, 512, 110);
+            ctx.fill();
+
+            // Glowing Outer Ring
+            ctx.strokeStyle = '#635BFF';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.roundRect(12, 12, 488, 488, 100);
+            ctx.stroke();
+
+            // Vibrant Paint Arc
+            ctx.lineWidth = 24;
+            ctx.lineCap = 'round';
+            const arcGrad = ctx.createLinearGradient(100, 400, 400, 100);
+            arcGrad.addColorStop(0, '#FF5263');
+            arcGrad.addColorStop(0.5, '#A855F7');
+            arcGrad.addColorStop(1, '#635BFF');
+            ctx.strokeStyle = arcGrad;
+            ctx.beginPath();
+            ctx.arc(256, 256, 150, Math.PI * 0.7, Math.PI * 1.8);
+            ctx.stroke();
+
+            // Brush Stylus
+            ctx.save();
+            ctx.translate(256, 256);
+            ctx.rotate(-Math.PI / 4);
+
+            // Handle
+            ctx.fillStyle = '#F8FAFC';
+            ctx.beginPath();
+            ctx.roundRect(-20, -140, 40, 200, 12);
+            ctx.fill();
+
+            // Metallic Collar
+            ctx.fillStyle = '#CBD5E1';
+            ctx.fillRect(-20, 60, 40, 20);
+
+            // Brush Tip
+            ctx.fillStyle = '#FF5263';
+            ctx.beginPath();
+            ctx.moveTo(-20, 80);
+            ctx.lineTo(20, 80);
+            ctx.lineTo(0, 130);
+            ctx.closePath();
+            ctx.fill();
+
+            ctx.restore();
+        }
+
+        function drawFeatureGraphic() {
+            const canvas = document.getElementById('featureCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Dark Studio Background with subtle grid pattern
+            const bgGrad = ctx.createLinearGradient(0, 0, 1024, 500);
+            bgGrad.addColorStop(0, '#0F1117');
+            bgGrad.addColorStop(1, '#1A1D28');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, 1024, 500);
+
+            // Decorative background glowing circles
+            const glow = ctx.createRadialGradient(200, 250, 10, 200, 250, 300);
+            glow.addColorStop(0, 'rgba(99, 91, 255, 0.25)');
+            glow.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, 1024, 500);
+
+            // App Title Text
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 56px sans-serif';
+            ctx.fillText('Drawing Pro', 80, 210);
+
+            ctx.fillStyle = '#9EA3B5';
+            ctx.font = '24px sans-serif';
+            ctx.fillText('Digital Canvas, Sketchpad & Photo Tracing', 80, 260);
+
+            // Badges
+            ctx.fillStyle = '#635BFF';
+            ctx.beginPath();
+            ctx.roundRect(80, 300, 180, 44, 22);
+            ctx.fill();
+
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = 'bold 16px sans-serif';
+            ctx.fillText('✦ 16.7M Color Wheel', 100, 328);
+
+            // Mockup Device on Right
+            ctx.fillStyle = '#101216';
+            ctx.strokeStyle = '#383C48';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.roundRect(620, 60, 320, 380, 28);
+            ctx.fill();
+            ctx.stroke();
+
+            // Inner Canvas White
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(636, 80, 288, 340);
+
+            // Drawn artwork inside mockup
+            ctx.strokeStyle = '#635BFF';
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(660, 200);
+            ctx.bezierCurveTo(700, 120, 800, 280, 880, 180);
+            ctx.stroke();
+
+            ctx.strokeStyle = '#FF5263';
+            ctx.lineWidth = 12;
+            ctx.beginPath();
+            ctx.moveTo(680, 300);
+            ctx.bezierCurveTo(740, 240, 820, 340, 890, 280);
+            ctx.stroke();
+        }
+
+        function drawScreenshot(canvasId, title, colorHex) {
+            const canvas = document.getElementById(canvasId);
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+
+            // Background
+            ctx.fillStyle = '#0F1117';
+            ctx.fillRect(0, 0, w, h);
+
+            // Header Caption Banner
+            ctx.fillStyle = colorHex;
+            ctx.font = 'bold 24px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(title, w / 2, 70);
+
+            // Phone Frame
+            ctx.fillStyle = '#1C1E24';
+            ctx.strokeStyle = '#383C48';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.roundRect(40, 110, w - 80, h - 140, 24);
+            ctx.fill();
+            ctx.stroke();
+
+            // Canvas Area inside phone
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(52, 130, w - 104, h - 260);
+
+            // Drawing strokes
+            ctx.strokeStyle = colorHex;
+            ctx.lineWidth = 8;
+            ctx.beginPath();
+            ctx.moveTo(100, 300);
+            ctx.bezierCurveTo(180, 180, 300, 420, 400, 280);
+            ctx.stroke();
+
+            // Floating Bottom Studio Dock Mockup
+            ctx.fillStyle = 'rgba(28, 30, 36, 0.95)';
+            ctx.beginPath();
+            ctx.roundRect(70, h - 220, w - 140, 60, 30);
+            ctx.fill();
+
+            // Swatches
+            const colors = ['#000000', '#635BFF', '#FF5263', '#10B981', '#F59E0B', '#FFFFFF'];
+            colors.forEach((c, i) => {
+                ctx.fillStyle = c;
+                ctx.beginPath();
+                ctx.arc(110 + i * 40, h - 190, 12, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        function downloadCanvas(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const image = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = image;
+            link.click();
+        }
+
+        window.onload = function() {
+            drawAppIcon();
+            drawFeatureGraphic();
+            drawScreenshot('ss1', 'Full Edge-to-Edge Studio Canvas', '#635BFF');
+            drawScreenshot('ss2', '16.7M HSV Color Wheel', '#A855F7');
+            drawScreenshot('ss3', 'Photo Tracing Opacity Control', '#FF5263');
+        };
+    </script>
+</body>
+</html>
