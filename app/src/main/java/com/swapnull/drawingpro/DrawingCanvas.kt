@@ -54,11 +54,16 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
+enum class BrushType {
+    PEN, HIGHLIGHTER, MARKER
+}
+
 data class PathData(
     val path: Path,
     val color: Color,
     val strokeWidth: Float,
-    val isEraser: Boolean = false
+    val isEraser: Boolean = false,
+    val brushType: BrushType = BrushType.PEN
 )
 
 enum class PaperStyle {
@@ -73,6 +78,7 @@ fun DrawingCanvas(
     pathUpdateTrigger: Long = 0L,
     currentPathColor: Color,
     currentPathStrokeWidth: Float,
+    currentBrushType: BrushType = BrushType.PEN,
     isEraserMode: Boolean,
     paperStyle: PaperStyle = PaperStyle.PLAIN,
     onPathStarted: (Offset) -> Unit,
@@ -137,9 +143,24 @@ fun DrawingCanvas(
                 paint.strokeWidth = pathData.strokeWidth
                 if (pathData.isEraser) {
                     paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+                    paint.strokeCap = Paint.Cap.ROUND
                 } else {
-                    paint.xfermode = null
                     paint.color = pathData.color.toArgb()
+                    when (pathData.brushType) {
+                        BrushType.PEN -> {
+                            paint.xfermode = null
+                            paint.strokeCap = Paint.Cap.ROUND
+                        }
+                        BrushType.HIGHLIGHTER -> {
+                            paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
+                            paint.strokeCap = Paint.Cap.SQUARE
+                            paint.alpha = (paint.alpha * 0.5f).toInt().coerceIn(0, 255)
+                        }
+                        BrushType.MARKER -> {
+                            paint.xfermode = null
+                            paint.strokeCap = Paint.Cap.SQUARE
+                        }
+                    }
                 }
                 androidCanvas.drawPath(pathData.path.asAndroidPath(), paint)
             }
@@ -157,9 +178,24 @@ fun DrawingCanvas(
                 paint.strokeWidth = pathData.strokeWidth
                 if (pathData.isEraser) {
                     paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.CLEAR)
+                    paint.strokeCap = Paint.Cap.ROUND
                 } else {
-                    paint.xfermode = null
                     paint.color = pathData.color.toArgb()
+                    when (pathData.brushType) {
+                        BrushType.PEN -> {
+                            paint.xfermode = null
+                            paint.strokeCap = Paint.Cap.ROUND
+                        }
+                        BrushType.HIGHLIGHTER -> {
+                            paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.MULTIPLY)
+                            paint.strokeCap = Paint.Cap.SQUARE
+                            paint.alpha = (paint.alpha * 0.5f).toInt().coerceIn(0, 255)
+                        }
+                        BrushType.MARKER -> {
+                            paint.xfermode = null
+                            paint.strokeCap = Paint.Cap.SQUARE
+                        }
+                    }
                 }
                 androidCanvas.drawPath(pathData.path.asAndroidPath(), paint)
             }
@@ -275,15 +311,24 @@ fun DrawingCanvas(
                 }
 
                 currentPath?.let { path ->
+                    val isHighlighter = currentBrushType == BrushType.HIGHLIGHTER
+                    val isMarker = currentBrushType == BrushType.MARKER
+                    
+                    val drawColor = if (isEraserMode) Color.Transparent else {
+                        if (isHighlighter) currentPathColor.copy(alpha = currentPathColor.alpha * 0.5f) else currentPathColor
+                    }
+                    
+                    val capStyle = if (isHighlighter || isMarker) StrokeCap.Square else StrokeCap.Round
+
                     drawPath(
                         path = path,
-                        color = if (isEraserMode) Color.Transparent else currentPathColor,
+                        color = drawColor,
                         style = Stroke(
                             width = currentPathStrokeWidth,
-                            cap = StrokeCap.Round,
+                            cap = capStyle,
                             join = StrokeJoin.Round
                         ),
-                        blendMode = if (isEraserMode) BlendMode.Clear else BlendMode.SrcOver
+                        blendMode = if (isEraserMode) BlendMode.Clear else if (isHighlighter) BlendMode.Multiply else BlendMode.SrcOver
                     )
                 }
             }

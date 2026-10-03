@@ -49,6 +49,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
+import com.swapnull.drawingpro.BrushType
 import com.swapnull.drawingpro.PaperStyle
 import com.swapnull.drawingpro.theme.AccentCobalt
 import kotlin.math.abs
@@ -59,6 +60,8 @@ fun StudioBrushSheet(
     onColorSelected: (Color) -> Unit,
     strokeWidth: Float,
     onStrokeWidthChanged: (Float) -> Unit,
+    currentBrushType: BrushType,
+    onBrushTypeChanged: (BrushType) -> Unit,
     paperStyle: PaperStyle,
     onPaperStyleChanged: (PaperStyle) -> Unit,
     isEraserMode: Boolean,
@@ -122,12 +125,19 @@ fun StudioBrushSheet(
                     quadraticTo(size.width * 0.75f, midY + 30f, endX, midY)
                 }
 
+                val isHighlighter = currentBrushType == BrushType.HIGHLIGHTER
+                val isMarker = currentBrushType == BrushType.MARKER
+                
+                val previewColor = if (isEraserMode) Color.Gray.copy(alpha = 0.6f) else {
+                    if (isHighlighter) selectedColor.copy(alpha = selectedColor.alpha * 0.5f) else selectedColor
+                }
+
                 drawPath(
                     path = path,
-                    color = if (isEraserMode) Color.Gray.copy(alpha = 0.6f) else selectedColor,
+                    color = previewColor,
                     style = Stroke(
                         width = strokeWidth,
-                        cap = StrokeCap.Round,
+                        cap = if (isHighlighter || isMarker) StrokeCap.Square else StrokeCap.Round,
                         join = StrokeJoin.Round
                     )
                 )
@@ -182,6 +192,41 @@ fun StudioBrushSheet(
                 )
             }
         }
+
+        // Brush Type Selection
+        Text(
+            text = "Brush Tool",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            BrushTypeCard(
+                title = "Pen",
+                isSelected = currentBrushType == BrushType.PEN,
+                onClick = { onBrushTypeChanged(BrushType.PEN) },
+                modifier = Modifier.weight(1f)
+            )
+            BrushTypeCard(
+                title = "Marker",
+                isSelected = currentBrushType == BrushType.MARKER,
+                onClick = { onBrushTypeChanged(BrushType.MARKER) },
+                modifier = Modifier.weight(1f)
+            )
+            BrushTypeCard(
+                title = "Highlighter",
+                isSelected = currentBrushType == BrushType.HIGHLIGHTER,
+                onClick = { onBrushTypeChanged(BrushType.HIGHLIGHTER) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Stroke Thickness Section
         Row(
@@ -490,6 +535,36 @@ private fun PaperCard(
 
         Spacer(modifier = Modifier.height(6.dp))
 
+        Text(
+            text = title,
+            style = MaterialTheme.typography.labelMedium,
+            color = if (isSelected) AccentCobalt else MaterialTheme.colorScheme.onSurface
+        )
+    }
+}
+
+@Composable
+private fun BrushTypeCard(
+    title: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(RoundedCornerShape(12.dp))
+            .background(
+                if (isSelected) AccentCobalt.copy(alpha = 0.15f) else MaterialTheme.colorScheme.surfaceVariant
+            )
+            .border(
+                width = if (isSelected) 2.dp else 1.dp,
+                color = if (isSelected) AccentCobalt else MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(12.dp)
+            )
+            .clickable { onClick() }
+            .padding(vertical = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
         Text(
             text = title,
             style = MaterialTheme.typography.labelMedium,

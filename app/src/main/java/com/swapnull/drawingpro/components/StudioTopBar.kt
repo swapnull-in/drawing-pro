@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.swapnull.drawingpro.BrushType
 import com.swapnull.drawingpro.PaperStyle
 import com.swapnull.drawingpro.theme.AccentCoral
 
@@ -52,6 +53,7 @@ fun StudioTopBar(
     onOpenPaperPicker: () -> Unit,
     selectedColor: Color,
     strokeWidth: Float,
+    currentBrushType: BrushType,
     isEraserMode: Boolean,
     onOpenBrushSheet: () -> Unit,
     hasBackgroundImage: Boolean,
@@ -131,6 +133,11 @@ fun StudioTopBar(
                         color = AccentCoral
                     )
                 } else {
+                    val brushLabel = when (currentBrushType) {
+                        BrushType.PEN -> "Pen"
+                        BrushType.HIGHLIGHTER -> "Highlighter"
+                        BrushType.MARKER -> "Marker"
+                    }
                     Box(
                         modifier = Modifier
                             .size(16.dp)
@@ -147,7 +154,7 @@ fun StudioTopBar(
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = "${strokeWidth.toInt()}px",
+                        text = "$brushLabel ${strokeWidth.toInt()}px",
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurface
                     )

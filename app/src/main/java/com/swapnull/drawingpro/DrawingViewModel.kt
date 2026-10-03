@@ -29,6 +29,9 @@ class DrawingViewModel : ViewModel() {
     var selectedColor by mutableStateOf(Color.Black)
         private set
 
+    var currentBrushType by mutableStateOf(BrushType.PEN)
+        private set
+
     var strokeWidth by mutableFloatStateOf(8f)
         private set
 
@@ -52,12 +55,14 @@ class DrawingViewModel : ViewModel() {
     private var activePathStrokeWidth = 8f
     private var activePathIsEraser = false
     private var activePathColor = Color.Black
+    private var activePathBrushType = BrushType.PEN
 
     fun startPath(offset: Offset) {
         undonePaths.clear()
         activePathStrokeWidth = if (isEraserMode) 60f else strokeWidth
         activePathIsEraser = isEraserMode
         activePathColor = selectedColor
+        activePathBrushType = currentBrushType
 
         val newPath = Path().apply {
             moveTo(offset.x, offset.y)
@@ -86,7 +91,8 @@ class DrawingViewModel : ViewModel() {
                     path = path,
                     color = activePathColor,
                     strokeWidth = activePathStrokeWidth,
-                    isEraser = activePathIsEraser
+                    isEraser = activePathIsEraser,
+                    brushType = activePathBrushType
                 )
             )
         }
@@ -126,6 +132,13 @@ class DrawingViewModel : ViewModel() {
 
     fun updateSelectedColor(color: Color) {
         selectedColor = color
+        if (isEraserMode) {
+            isEraserMode = false
+        }
+    }
+
+    fun updateBrushType(type: BrushType) {
+        currentBrushType = type
         if (isEraserMode) {
             isEraserMode = false
         }
