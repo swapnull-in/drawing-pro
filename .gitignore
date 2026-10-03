@@ -12,3 +12,4 @@
 *.ap_
 *.apk
 *.dex
+\n# Play Store Assets\nplay_store_assets/*.zip\nplay_store_assets/*.txt
