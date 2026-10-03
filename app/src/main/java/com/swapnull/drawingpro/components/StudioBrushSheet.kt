@@ -50,6 +50,7 @@ import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.swapnull.drawingpro.BrushType
+import com.swapnull.drawingpro.DrawingMode
 import com.swapnull.drawingpro.PaperStyle
 import com.swapnull.drawingpro.theme.AccentCobalt
 import kotlin.math.abs
@@ -62,6 +63,8 @@ fun StudioBrushSheet(
     onStrokeWidthChanged: (Float) -> Unit,
     currentBrushType: BrushType,
     onBrushTypeChanged: (BrushType) -> Unit,
+    drawingMode: DrawingMode,
+    onDrawingModeChanged: (DrawingMode) -> Unit,
     paperStyle: PaperStyle,
     onPaperStyleChanged: (PaperStyle) -> Unit,
     isEraserMode: Boolean,
@@ -222,6 +225,82 @@ fun StudioBrushSheet(
                 title = "Highlighter",
                 isSelected = currentBrushType == BrushType.HIGHLIGHTER,
                 onClick = { onBrushTypeChanged(BrushType.HIGHLIGHTER) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Brush Type Selection
+        Text(
+            text = "Brush Tool",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            BrushTypeCard(
+                title = "Pen",
+                isSelected = currentBrushType == BrushType.PEN,
+                onClick = { onBrushTypeChanged(BrushType.PEN) },
+                modifier = Modifier.weight(1f)
+            )
+            BrushTypeCard(
+                title = "Marker",
+                isSelected = currentBrushType == BrushType.MARKER,
+                onClick = { onBrushTypeChanged(BrushType.MARKER) },
+                modifier = Modifier.weight(1f)
+            )
+            BrushTypeCard(
+                title = "Highlighter",
+                isSelected = currentBrushType == BrushType.HIGHLIGHTER,
+                onClick = { onBrushTypeChanged(BrushType.HIGHLIGHTER) },
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Drawing Mode Selection
+        Text(
+            text = "Drawing Mode",
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(12.dp))
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            BrushTypeCard(
+                title = "Freehand",
+                isSelected = drawingMode == DrawingMode.FREEHAND,
+                onClick = { onDrawingModeChanged(DrawingMode.FREEHAND) },
+                modifier = Modifier.weight(1f)
+            )
+            BrushTypeCard(
+                title = "Line",
+                isSelected = drawingMode == DrawingMode.LINE,
+                onClick = { onDrawingModeChanged(DrawingMode.LINE) },
+                modifier = Modifier.weight(1f)
+            )
+            BrushTypeCard(
+                title = "Rect",
+                isSelected = drawingMode == DrawingMode.RECTANGLE,
+                onClick = { onDrawingModeChanged(DrawingMode.RECTANGLE) },
+                modifier = Modifier.weight(1f)
+            )
+            BrushTypeCard(
+                title = "Circle",
+                isSelected = drawingMode == DrawingMode.CIRCLE,
+                onClick = { onDrawingModeChanged(DrawingMode.CIRCLE) },
                 modifier = Modifier.weight(1f)
             )
         }

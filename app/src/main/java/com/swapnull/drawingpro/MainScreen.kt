@@ -287,6 +287,8 @@ fun MainScreen(
                     onStrokeWidthChanged = { width -> viewModel.updateStrokeWidth(width) },
                     currentBrushType = viewModel.currentBrushType,
                     onBrushTypeChanged = { type -> viewModel.updateBrushType(type) },
+                    drawingMode = viewModel.drawingMode,
+                    onDrawingModeChanged = { mode -> viewModel.updateDrawingMode(mode) },
                     paperStyle = viewModel.paperStyle,
                     onPaperStyleChanged = { style -> viewModel.updatePaperStyle(style) },
                     isEraserMode = viewModel.isEraserMode,

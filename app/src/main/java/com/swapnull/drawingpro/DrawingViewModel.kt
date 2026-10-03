@@ -11,6 +11,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.lifecycle.ViewModel
+import kotlin.math.hypot
+import androidx.compose.ui.geometry.Rect
+
+enum class DrawingMode {
+    FREEHAND, LINE, RECTANGLE, CIRCLE
+}
 
 class DrawingViewModel : ViewModel() {
 
@@ -30,6 +36,9 @@ class DrawingViewModel : ViewModel() {
         private set
 
     var currentBrushType by mutableStateOf(BrushType.PEN)
+        private set
+
+    var drawingMode by mutableStateOf(DrawingMode.FREEHAND)
         private set
 
     var strokeWidth by mutableFloatStateOf(8f)
@@ -52,6 +61,7 @@ class DrawingViewModel : ViewModel() {
     var showClearConfirmDialog by mutableStateOf(false)
 
     private var previousPoint: Offset? = null
+    private var startPoint: Offset? = null
     private var activePathStrokeWidth = 8f
     private var activePathIsEraser = false
     private var activePathColor = Color.Black
@@ -69,18 +79,49 @@ class DrawingViewModel : ViewModel() {
         }
         currentPath = newPath
         previousPoint = offset
+        startPoint = offset
         pathUpdateTrigger++
     }
 
     fun movePath(offset: Offset) {
-        val prev = previousPoint ?: return
         val current = currentPath ?: return
+        val start = startPoint ?: return
 
-        val midX = (prev.x + offset.x) / 2f
-        val midY = (prev.y + offset.y) / 2f
-
-        current.quadraticTo(prev.x, prev.y, midX, midY)
-        previousPoint = offset
+        when (drawingMode) {
+            DrawingMode.FREEHAND -> {
+                val prev = previousPoint ?: return
+                val midX = (prev.x + offset.x) / 2f
+                val midY = (prev.y + offset.y) / 2f
+                current.quadraticTo(prev.x, prev.y, midX, midY)
+                previousPoint = offset
+            }
+            DrawingMode.LINE -> {
+                current.reset()
+                current.moveTo(start.x, start.y)
+                current.lineTo(offset.x, offset.y)
+            }
+            DrawingMode.RECTANGLE -> {
+                current.reset()
+                val rect = Rect(
+                    left = minOf(start.x, offset.x),
+                    top = minOf(start.y, offset.y),
+                    right = maxOf(start.x, offset.x),
+                    bottom = maxOf(start.y, offset.y)
+                )
+                current.addRect(rect)
+            }
+            DrawingMode.CIRCLE -> {
+                current.reset()
+                val radius = hypot(offset.x - start.x, offset.y - start.y)
+                val rect = Rect(
+                    left = start.x - radius,
+                    top = start.y - radius,
+                    right = start.x + radius,
+                    bottom = start.y + radius
+                )
+                current.addOval(rect)
+            }
+        }
         pathUpdateTrigger++
     }
 
@@ -140,6 +181,13 @@ class DrawingViewModel : ViewModel() {
     fun updateBrushType(type: BrushType) {
         currentBrushType = type
         if (isEraserMode) {
+            isEraserMode = false
+        }
+    }
+
+    fun updateDrawingMode(mode: DrawingMode) {
+        drawingMode = mode
+        if (isEraserMode && mode != DrawingMode.FREEHAND) {
             isEraserMode = false
         }
     }
