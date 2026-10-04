@@ -54,12 +54,15 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 
+import com.swapnull.drawingpro.model.DrawAction
+
 enum class BrushType {
     PEN, HIGHLIGHTER, MARKER
 }
 
 data class PathData(
     val path: Path,
+    val actions: List<DrawAction> = emptyList(),
     val color: Color,
     val strokeWidth: Float,
     val isEraser: Boolean = false,

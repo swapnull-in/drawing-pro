@@ -48,6 +48,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.swapnull.drawingpro.BrushType
 import com.swapnull.drawingpro.DrawingMode
@@ -75,6 +77,7 @@ fun StudioBrushSheet(
     onToggleExportTransparentBg: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
+    val haptic = LocalHapticFeedback.current
     var showCustomColorPicker by remember { mutableStateOf(false) }
 
     val essentialColors = listOf(
@@ -212,19 +215,28 @@ fun StudioBrushSheet(
             BrushTypeCard(
                 title = "Pen",
                 isSelected = currentBrushType == BrushType.PEN,
-                onClick = { onBrushTypeChanged(BrushType.PEN) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onBrushTypeChanged(BrushType.PEN) 
+                },
                 modifier = Modifier.weight(1f)
             )
             BrushTypeCard(
                 title = "Marker",
                 isSelected = currentBrushType == BrushType.MARKER,
-                onClick = { onBrushTypeChanged(BrushType.MARKER) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onBrushTypeChanged(BrushType.MARKER) 
+                },
                 modifier = Modifier.weight(1f)
             )
             BrushTypeCard(
                 title = "Highlighter",
                 isSelected = currentBrushType == BrushType.HIGHLIGHTER,
-                onClick = { onBrushTypeChanged(BrushType.HIGHLIGHTER) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onBrushTypeChanged(BrushType.HIGHLIGHTER) 
+                },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -247,19 +259,28 @@ fun StudioBrushSheet(
             BrushTypeCard(
                 title = "Pen",
                 isSelected = currentBrushType == BrushType.PEN,
-                onClick = { onBrushTypeChanged(BrushType.PEN) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onBrushTypeChanged(BrushType.PEN) 
+                },
                 modifier = Modifier.weight(1f)
             )
             BrushTypeCard(
                 title = "Marker",
                 isSelected = currentBrushType == BrushType.MARKER,
-                onClick = { onBrushTypeChanged(BrushType.MARKER) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onBrushTypeChanged(BrushType.MARKER) 
+                },
                 modifier = Modifier.weight(1f)
             )
             BrushTypeCard(
                 title = "Highlighter",
                 isSelected = currentBrushType == BrushType.HIGHLIGHTER,
-                onClick = { onBrushTypeChanged(BrushType.HIGHLIGHTER) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onBrushTypeChanged(BrushType.HIGHLIGHTER) 
+                },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -282,25 +303,37 @@ fun StudioBrushSheet(
             BrushTypeCard(
                 title = "Freehand",
                 isSelected = drawingMode == DrawingMode.FREEHAND,
-                onClick = { onDrawingModeChanged(DrawingMode.FREEHAND) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onDrawingModeChanged(DrawingMode.FREEHAND) 
+                },
                 modifier = Modifier.weight(1f)
             )
             BrushTypeCard(
                 title = "Line",
                 isSelected = drawingMode == DrawingMode.LINE,
-                onClick = { onDrawingModeChanged(DrawingMode.LINE) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onDrawingModeChanged(DrawingMode.LINE) 
+                },
                 modifier = Modifier.weight(1f)
             )
             BrushTypeCard(
                 title = "Rect",
                 isSelected = drawingMode == DrawingMode.RECTANGLE,
-                onClick = { onDrawingModeChanged(DrawingMode.RECTANGLE) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onDrawingModeChanged(DrawingMode.RECTANGLE) 
+                },
                 modifier = Modifier.weight(1f)
             )
             BrushTypeCard(
                 title = "Circle",
                 isSelected = drawingMode == DrawingMode.CIRCLE,
-                onClick = { onDrawingModeChanged(DrawingMode.CIRCLE) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onDrawingModeChanged(DrawingMode.CIRCLE) 
+                },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -341,7 +374,10 @@ fun StudioBrushSheet(
                         .background(
                             if (isSelected) AccentCobalt else MaterialTheme.colorScheme.surfaceVariant
                         )
-                        .clickable { onStrokeWidthChanged(presetWidth) }
+                        .clickable { 
+                            haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                            onStrokeWidthChanged(presetWidth) 
+                        }
                         .padding(vertical = 8.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -378,7 +414,10 @@ fun StudioBrushSheet(
             )
 
             OutlinedButton(
-                onClick = { showCustomColorPicker = !showCustomColorPicker },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    showCustomColorPicker = !showCustomColorPicker 
+                },
                 shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(
@@ -403,7 +442,10 @@ fun StudioBrushSheet(
         ) {
             CustomColorPicker(
                 currentColor = selectedColor,
-                onColorChanged = onColorSelected,
+                onColorChanged = { color ->
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onColorSelected(color)
+                },
                 modifier = Modifier.padding(bottom = 16.dp)
             )
         }
@@ -439,28 +481,40 @@ fun StudioBrushSheet(
             PaperCard(
                 title = "Plain",
                 isSelected = paperStyle == PaperStyle.PLAIN,
-                onClick = { onPaperStyleChanged(PaperStyle.PLAIN) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onPaperStyleChanged(PaperStyle.PLAIN) 
+                },
                 modifier = Modifier.weight(1f),
                 style = PaperStyle.PLAIN
             )
             PaperCard(
                 title = "Grid",
                 isSelected = paperStyle == PaperStyle.GRID,
-                onClick = { onPaperStyleChanged(PaperStyle.GRID) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onPaperStyleChanged(PaperStyle.GRID) 
+                },
                 modifier = Modifier.weight(1f),
                 style = PaperStyle.GRID
             )
             PaperCard(
                 title = "Dots",
                 isSelected = paperStyle == PaperStyle.DOTS,
-                onClick = { onPaperStyleChanged(PaperStyle.DOTS) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onPaperStyleChanged(PaperStyle.DOTS) 
+                },
                 modifier = Modifier.weight(1f),
                 style = PaperStyle.DOTS
             )
             PaperCard(
                 title = "Ruled",
                 isSelected = paperStyle == PaperStyle.RULED,
-                onClick = { onPaperStyleChanged(PaperStyle.RULED) },
+                onClick = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onPaperStyleChanged(PaperStyle.RULED) 
+                },
                 modifier = Modifier.weight(1f),
                 style = PaperStyle.RULED
             )
@@ -502,7 +556,10 @@ fun StudioBrushSheet(
 
             Switch(
                 checked = exportTransparentBg,
-                onCheckedChange = { onToggleExportTransparentBg() }
+                onCheckedChange = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    onToggleExportTransparentBg() 
+                }
             )
         }
 
@@ -522,6 +579,7 @@ private fun ColorRow(
     ) {
         items(colors) { color ->
             val isSelected = selectedColor == color
+            val haptic = LocalHapticFeedback.current
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -532,7 +590,10 @@ private fun ColorRow(
                         color = if (isSelected) AccentCobalt else MaterialTheme.colorScheme.outlineVariant,
                         shape = CircleShape
                     )
-                    .clickable { onColorSelected(color) },
+                    .clickable { 
+                        haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        onColorSelected(color) 
+                    },
                 contentAlignment = Alignment.Center
             ) {
                 if (isSelected) {

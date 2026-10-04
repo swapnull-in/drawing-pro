@@ -13,6 +13,8 @@ import androidx.compose.ui.graphics.Path
 import androidx.lifecycle.ViewModel
 import kotlin.math.hypot
 import androidx.compose.ui.geometry.Rect
+import com.swapnull.drawingpro.model.ActionType
+import com.swapnull.drawingpro.model.DrawAction
 
 enum class DrawingMode {
     FREEHAND, LINE, RECTANGLE, CIRCLE
@@ -66,9 +68,11 @@ class DrawingViewModel : ViewModel() {
     private var activePathIsEraser = false
     private var activePathColor = Color.Black
     private var activePathBrushType = BrushType.PEN
+    private var currentActions = mutableListOf<DrawAction>()
 
     fun startPath(offset: Offset) {
         undonePaths.clear()
+        currentActions.clear()
         activePathStrokeWidth = if (isEraserMode) 60f else strokeWidth
         activePathIsEraser = isEraserMode
         activePathColor = selectedColor
@@ -77,6 +81,8 @@ class DrawingViewModel : ViewModel() {
         val newPath = Path().apply {
             moveTo(offset.x, offset.y)
         }
+        currentActions.add(DrawAction(ActionType.MOVE_TO, x1 = offset.x, y1 = offset.y))
+        
         currentPath = newPath
         previousPoint = offset
         startPoint = offset
@@ -93,12 +99,17 @@ class DrawingViewModel : ViewModel() {
                 val midX = (prev.x + offset.x) / 2f
                 val midY = (prev.y + offset.y) / 2f
                 current.quadraticTo(prev.x, prev.y, midX, midY)
+                currentActions.add(DrawAction(ActionType.QUAD_TO, x1 = prev.x, y1 = prev.y, x2 = midX, y2 = midY))
                 previousPoint = offset
             }
             DrawingMode.LINE -> {
                 current.reset()
                 current.moveTo(start.x, start.y)
                 current.lineTo(offset.x, offset.y)
+                currentActions.clear()
+                currentActions.add(DrawAction(ActionType.RESET))
+                currentActions.add(DrawAction(ActionType.MOVE_TO, x1 = start.x, y1 = start.y))
+                currentActions.add(DrawAction(ActionType.LINE_TO, x1 = offset.x, y1 = offset.y))
             }
             DrawingMode.RECTANGLE -> {
                 current.reset()
@@ -109,6 +120,9 @@ class DrawingViewModel : ViewModel() {
                     bottom = maxOf(start.y, offset.y)
                 )
                 current.addRect(rect)
+                currentActions.clear()
+                currentActions.add(DrawAction(ActionType.RESET))
+                currentActions.add(DrawAction(ActionType.ADD_RECT, x1 = rect.left, y1 = rect.top, x2 = rect.right, y2 = rect.bottom))
             }
             DrawingMode.CIRCLE -> {
                 current.reset()
@@ -120,6 +134,9 @@ class DrawingViewModel : ViewModel() {
                     bottom = start.y + radius
                 )
                 current.addOval(rect)
+                currentActions.clear()
+                currentActions.add(DrawAction(ActionType.RESET))
+                currentActions.add(DrawAction(ActionType.ADD_OVAL, x1 = rect.left, y1 = rect.top, x2 = rect.right, y2 = rect.bottom))
             }
         }
         pathUpdateTrigger++
@@ -130,6 +147,7 @@ class DrawingViewModel : ViewModel() {
             paths.add(
                 PathData(
                     path = path,
+                    actions = currentActions.toList(),
                     color = activePathColor,
                     strokeWidth = activePathStrokeWidth,
                     isEraser = activePathIsEraser,
@@ -138,6 +156,7 @@ class DrawingViewModel : ViewModel() {
             )
         }
         currentPath = null
+        currentActions.clear()
         previousPoint = null
         pathUpdateTrigger++
     }

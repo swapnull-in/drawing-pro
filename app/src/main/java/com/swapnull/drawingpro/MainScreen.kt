@@ -43,8 +43,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asAndroidPath
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.core.content.ContextCompat
@@ -64,6 +66,7 @@ fun MainScreen(
     viewModel: DrawingViewModel = viewModel()
 ) {
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
     val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -240,20 +243,44 @@ fun MainScreen(
             StudioTopBar(
                 canUndo = viewModel.paths.isNotEmpty(),
                 canRedo = viewModel.undonePaths.isNotEmpty(),
-                onUndo = { viewModel.undo() },
-                onRedo = { viewModel.redo() },
+                onUndo = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    viewModel.undo() 
+                },
+                onRedo = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    viewModel.redo() 
+                },
                 paperStyle = viewModel.paperStyle,
-                onOpenPaperPicker = { viewModel.showBrushSettingsSheet = true },
+                onOpenPaperPicker = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.showBrushSettingsSheet = true 
+                },
                 selectedColor = viewModel.selectedColor,
                 strokeWidth = viewModel.strokeWidth,
                 currentBrushType = viewModel.currentBrushType,
                 isEraserMode = viewModel.isEraserMode,
-                onOpenBrushSheet = { viewModel.showBrushSettingsSheet = true },
+                onOpenBrushSheet = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.showBrushSettingsSheet = true 
+                },
                 hasBackgroundImage = viewModel.backgroundImage != null,
-                onRemoveBackgroundImage = { viewModel.updateBackgroundImage(null) },
-                onClearCanvas = { viewModel.showClearConfirmDialog = true },
-                onSave = { handleSaveDrawing() },
-                onShare = { handleShareDrawing() },
+                onRemoveBackgroundImage = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.updateBackgroundImage(null) 
+                },
+                onClearCanvas = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.showClearConfirmDialog = true 
+                },
+                onSave = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    handleSaveDrawing() 
+                },
+                onShare = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    handleShareDrawing() 
+                },
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .systemBarsPadding()
@@ -262,12 +289,27 @@ fun MainScreen(
             // Floating Bottom Studio Glass Dock
             StudioBottomDock(
                 isEraserMode = viewModel.isEraserMode,
-                onToggleEraser = { viewModel.toggleEraserMode() },
+                onToggleEraser = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.toggleEraserMode() 
+                },
                 selectedColor = viewModel.selectedColor,
-                onColorSelected = { color -> viewModel.updateSelectedColor(color) },
-                onOpenBrushSheet = { viewModel.showBrushSettingsSheet = true },
-                onPickGalleryImage = { galleryLauncher.launch("image/*") },
-                onCaptureCameraPhoto = { launchCamera() },
+                onColorSelected = { color -> 
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                    viewModel.updateSelectedColor(color) 
+                },
+                onOpenBrushSheet = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.showBrushSettingsSheet = true 
+                },
+                onPickGalleryImage = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    galleryLauncher.launch("image/*") 
+                },
+                onCaptureCameraPhoto = { 
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    launchCamera() 
+                },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .systemBarsPadding()
