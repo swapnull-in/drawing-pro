@@ -11,16 +11,37 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import kotlin.math.hypot
 import androidx.compose.ui.geometry.Rect
+import com.swapnull.drawingpro.database.DrawingProject
 import com.swapnull.drawingpro.model.ActionType
 import com.swapnull.drawingpro.model.DrawAction
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 enum class DrawingMode {
     FREEHAND, LINE, RECTANGLE, CIRCLE
 }
 
-class DrawingViewModel : ViewModel() {
+class DrawingViewModel(private val repository: DrawingRepository) : ViewModel() {
+
+    private val _projects = MutableStateFlow<List<DrawingProject>>(emptyList())
+    val projects: StateFlow<List<DrawingProject>> = _projects.asStateFlow()
+
+    var currentProjectId by mutableLongStateOf(0L)
+        private set
+
+    init {
+        viewModelScope.launch {
+            repository.allProjects.collect { projectList ->
+                _projects.value = projectList
+            }
+        }
+    }
 
     val paths = mutableStateListOf<PathData>()
     val undonePaths = mutableStateListOf<PathData>()
@@ -180,6 +201,7 @@ class DrawingViewModel : ViewModel() {
         undonePaths.clear()
         currentPath = null
         backgroundImage = null
+        currentProjectId = 0L
         pathUpdateTrigger++
     }
 
@@ -231,5 +253,49 @@ class DrawingViewModel : ViewModel() {
 
     fun toggleExportTransparentBg() {
         exportTransparentBg = !exportTransparentBg
+    }
+
+    fun saveCurrentProject(name: String) {
+        viewModelScope.launch {
+            val id = repository.saveProject(
+                id = currentProjectId,
+                name = name,
+                paths = paths.toList(),
+                paperStyle = paperStyle
+            )
+            currentProjectId = id
+        }
+    }
+
+    fun loadProject(project: DrawingProject) {
+        viewModelScope.launch {
+            val (loadedPaths, style) = repository.loadProjectPaths(project)
+            paths.clear()
+            paths.addAll(loadedPaths)
+            undonePaths.clear()
+            paperStyle = style
+            currentProjectId = project.id
+            backgroundImage = null // Or handle background image reloading if stored
+            pathUpdateTrigger++
+        }
+    }
+
+    fun deleteProject(project: DrawingProject) {
+        viewModelScope.launch {
+            repository.deleteProject(project)
+            if (currentProjectId == project.id) {
+                clearCanvas()
+            }
+        }
+    }
+}
+
+class DrawingViewModelFactory(private val repository: DrawingRepository) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(DrawingViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return DrawingViewModel(repository) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.GridOn
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.Collections
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -61,6 +62,7 @@ fun StudioTopBar(
     onClearCanvas: () -> Unit,
     onSave: () -> Unit,
     onShare: () -> Unit,
+    onOpenGallery: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -80,8 +82,22 @@ fun StudioTopBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Undo & Redo Group
+            // Left Group: Gallery & Undo/Redo
             Row(verticalAlignment = Alignment.CenterVertically) {
+                IconButton(
+                    onClick = onOpenGallery,
+                    modifier = Modifier.size(36.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Collections,
+                        contentDescription = "Projects Gallery",
+                        tint = MaterialTheme.colorScheme.onSurface,
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(4.dp))
+
                 IconButton(
                     onClick = onUndo,
                     enabled = canUndo,

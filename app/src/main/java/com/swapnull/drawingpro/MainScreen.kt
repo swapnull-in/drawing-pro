@@ -19,14 +19,31 @@ import android.os.Environment
 import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -34,6 +51,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -49,6 +67,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -72,8 +91,13 @@ fun MainScreen(
 
     var canvasSize by remember { mutableStateOf(IntSize.Zero) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
+    
+    var showProjectsGallery by remember { mutableStateOf(false) }
+    var showSaveProjectDialog by remember { mutableStateOf(false) }
+    var projectNameInput by remember { mutableStateOf("") }
 
     val sheetState = rememberModalBottomSheetState()
+    val gallerySheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -186,6 +210,41 @@ fun MainScreen(
         }
     }
 
+    if (showSaveProjectDialog) {
+        AlertDialog(
+            onDismissRequest = { showSaveProjectDialog = false },
+            title = { Text("Save Project") },
+            text = {
+                OutlinedTextField(
+                    value = projectNameInput,
+                    onValueChange = { projectNameInput = it },
+                    label = { Text("Project Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        val name = projectNameInput.takeIf { it.isNotBlank() } ?: "Untitled Project"
+                        viewModel.saveCurrentProject(name)
+                        showSaveProjectDialog = false
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Project saved successfully!")
+                        }
+                    }
+                ) {
+                    Text("Save")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSaveProjectDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     if (viewModel.showClearConfirmDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.showClearConfirmDialog = false },
@@ -275,11 +334,16 @@ fun MainScreen(
                 },
                 onSave = { 
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    showSaveProjectDialog = true
                     handleSaveDrawing() 
                 },
                 onShare = { 
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     handleShareDrawing() 
+                },
+                onOpenGallery = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    showProjectsGallery = true
                 },
                 modifier = Modifier
                     .align(Alignment.TopCenter)
@@ -340,6 +404,56 @@ fun MainScreen(
                     exportTransparentBg = viewModel.exportTransparentBg,
                     onToggleExportTransparentBg = { viewModel.toggleExportTransparentBg() }
                 )
+            }
+        }
+        if (showProjectsGallery) {
+            val projects by viewModel.projects.collectAsState()
+            
+            ModalBottomSheet(
+                onDismissRequest = { showProjectsGallery = false },
+                sheetState = gallerySheetState,
+                containerColor = MaterialTheme.colorScheme.surface
+            ) {
+                Column(modifier = Modifier.padding(16.dp).fillMaxWidth().height(400.dp)) {
+                    Text("Saved Projects", style = MaterialTheme.typography.headlineSmall, modifier = Modifier.padding(bottom = 16.dp))
+                    
+                    if (projects.isEmpty()) {
+                        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Text("No saved projects yet.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    } else {
+                        LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                            items(projects) { project ->
+                                Card(
+                                    modifier = Modifier.fillMaxWidth().clickable {
+                                        viewModel.loadProject(project)
+                                        showProjectsGallery = false
+                                        coroutineScope.launch { snackbarHostState.showSnackbar("Loaded ${project.name}") }
+                                    },
+                                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                                ) {
+                                    Row(
+                                        modifier = Modifier.padding(16.dp).fillMaxWidth(),
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.SpaceBetween
+                                    ) {
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(project.name, style = MaterialTheme.typography.titleMedium)
+                                            Text(
+                                                "Style: ${project.paperStyle} • Last updated: ${java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault()).format(java.util.Date(project.updatedAt))}",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                            )
+                                        }
+                                        IconButton(onClick = { viewModel.deleteProject(project) }) {
+                                            Icon(Icons.Default.Delete, contentDescription = "Delete Project", tint = MaterialTheme.colorScheme.error)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
